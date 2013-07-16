@@ -4,7 +4,7 @@
 
 ### Description
 
-**SwitchBoard** is a utility gem designed to help in the coordinate of locked object to a set of "lockers".
+**SwitchBoard** is a utility gem designed to help in the coordination of locked objects by a set of "lockers".
 Think of a bank's cashiers, where customers are in line to be served, they are the dataset.
 
 When a customer is served by a cashier, it is still in line to be served, but is now "locked".
@@ -19,9 +19,13 @@ As such, the workflow has two main components:
 * Dataset - Implementaion is Solr based for now, but can be replaced.
 * Persistance - Implement is Redis based, but can be replaced
 
-### The Dataset
+The overall scope of the gem is:
 
-This is the main set of content from which "lockers"
+* Allow "lockers" to register themselves
+* Allow "lockers" to set a "lock" on object, with a predefined expiration period
+* Allow any client to retrive data from some persistance layer excluding the keys that are locked at the moment.
+* Allow external observes to see current state of locked object
+
 
 ### Features
 
