@@ -1,8 +1,6 @@
 ## switch_board
 
-* [Homepage](https://rubygems.org/gems/switch_board)
-* [Documentation](http://rubydoc.info/gems/switch_board/frames)
-* Email - mailto:israbirding at gmail.com
+![http://makemusicals.com/2011/11/communication-101-toeing-the-party-line/switchboard1/](http://makemusicals.com/wp-content/uploads/2011/11/switchboard1-300x236.jpg "Switchboard")
 
 ### Description
 
@@ -29,11 +27,38 @@ It is pluggable and well tested so should allow extensions as needed.
 
 ### Examples
 
-````
-  require 'switch_board'
-````
+````ruby
 
-### Requirements
+  require 'switch_board'
+
+
+  #create a new switch_board configuration
+  sb = SwitchBoard::Configuration.new #default to Solr + Redis backends
+  dataset = sb.dataset
+
+  #Register Lockers (unique identifier, Name/Alias)
+  dataset.register_locker(1, "Django")
+  dataset.register_locker(2, "Pier")
+  dataset.register_locker(3, "Mark")
+
+  #Print out the list of active users
+  p dataset.list_lockers
+
+  #Lock IDs for Pier - IDed as 2
+  dataset.lock_id(2, "qwerfggj", 5) # lock for 5 seconds
+  dataset.lock_id(2, "12345", 600) #Lock for 10 minutes
+
+  #Check to see if ID is locked
+  dataset.is_id_locked?("12345") #=> true
+  dataset.is_id_locked?("qwerfggj") #=> true
+  dataset.is_id_locked?("not_locked_id") #=> false
+
+  #Show all locked objects
+  dataset.get_all_locked_ids #=> {"12345"=>"2", "qwerfggj"=>"2"}
+
+
+
+````
 
 ### Install
 

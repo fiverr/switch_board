@@ -23,12 +23,13 @@ module SwitchBoard
     #filter out the locked , if respect_locked = true
     def get_next(limit = 1, respect_locks = true)
       locked_ids = []
-      base_set = persistance.candidates
       if respect_locks
-        locked_ids = get_locked
+        locked_ids = get_all_locked_ids.keys # take just the keys, values are the UID of the lockers
       end
-
-      available = base_set - locked_ids
+      #Query from persistance for results, add a buffer
+      base_set = persistance.candidates(limit + locked_ids.count)
+      remove_locked = base_set.reject {|item| locked_ids.include?(item["id"]) }
+      remove_locked[0..limit-1]
     end
 
     def get_locked
@@ -38,9 +39,9 @@ module SwitchBoard
 
     def switchboard
       @switchboard ||= (
-      @con.del SWITCHBOARD_NAME
-      @con.smembers SWITCHBOARD_NAME
-      )
+                                  @con.del SWITCHBOARD_NAME
+                                  @con.smembers SWITCHBOARD_NAME
+                                  )
     end
 
     def register_locker(uid, name)
@@ -69,11 +70,6 @@ module SwitchBoard
     #Check if key exists to see if it is locked and it has not expired
     #before getting keys, remove expired keys
     def is_id_locked?(id_to_check)
-      keys = @con.zrangebyscore("#{LOCK_MAP_KEY}_z", 0, Time.now.to_i)
-      if keys.size > 0
-        @con.zremrangebyscore("#{LOCK_MAP_KEY}_z", 0, Time.now.to_i)
-        keys.each {|key| @con.hdel("#{LOCK_MAP_KEY}_h", key)}
-      end
       @con.hexists("#{LOCK_MAP_KEY}_h", id_to_check)
     end
 
@@ -83,12 +79,21 @@ module SwitchBoard
     end
 
     def get_all_locked_ids
+      clean_old_keys
       @con.hgetall "#{LOCK_MAP_KEY}_h"
     end
 
 
     ##################### Private Methods #################
     private
+
+    def clean_old_keys
+      keys = @con.zrangebyscore("#{LOCK_MAP_KEY}_z", 0, Time.now.to_i)
+      if keys.size > 0
+        @con.zremrangebyscore("#{LOCK_MAP_KEY}_z", 0, Time.now.to_i)
+        keys.each {|key| @con.hdel("#{LOCK_MAP_KEY}_h", key)}
+      end
+    end
 
   end
 

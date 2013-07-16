@@ -12,7 +12,8 @@ module SwitchBoard
     end
 
     def candidates(limit = 5)
-      @solr.get 'gigs_for_search/select', :params => {:q => '*:*'}
+      resp = @solr.get 'gigs_for_search/select', :params => {:q => '*:*', :fl => "id", :rows => limit}
+      resp["response"]["docs"]
     end
 
   end

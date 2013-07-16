@@ -10,7 +10,6 @@ gem 'redis'
 gem 'redis-objects'
 gem 'rsolr'
 
-
 group :test do
   gem 'rspec'
 end

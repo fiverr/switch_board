@@ -27,10 +27,12 @@ describe :RedisDataset do
 
   it "should allow getting next ids with default" do
     expect { dataset.get_next }.not_to raise_error
+    dataset.get_next.count.should eq 1
   end
 
   it "should allow getting next 3 ids" do
     expect { dataset.get_next(3) }.not_to raise_error
+    dataset.get_next(3).count.should eq 3
   end
 
   it "should implemenet get_locked" do
@@ -89,9 +91,9 @@ describe :RedisDataset do
     it "should allow should lock id only for as per expiration time" do
       dataset.register_locker(1, "Pupik")
       dataset.register_locker(2, "Raz")
-      expect { dataset.lock_id(1, "SOME_ID_2", 3) }.not_to raise_error
+      expect { dataset.lock_id(1, "SOME_ID_2", 1) }.not_to raise_error
       dataset.is_id_locked?("SOME_ID_2").should be_true
-      sleep(5)
+      sleep(2)
       dataset.is_id_locked?("SOME_ID_3").should be_false
     end
 
@@ -111,6 +113,36 @@ describe :RedisDataset do
       dataset.get_all_locked_ids.count.should eq 4
     end
 
+    it "should get clean results when no IPs are locked" do
+      dataset.register_locker(1, "Pupik")
+      dataset.register_locker(2, "Raz")
+      dataset.get_all_locked_ids.count.should eq 0
+    end
+
+    ##@TODO need to stub Solr so that test is not Solr dependent
+    #Converting to array in this check, because rspec can't compare ennumarators
+    it "should give consistent results when no lockers present" do
+      call1 = dataset.get_next(2)
+      call2 = dataset.get_next(2)
+      call1.should be_eql(call2)
+    end
+
+    it "should respect limit when lock present" do
+      dataset.register_locker(2, "Raz")
+      dataset.lock_id(2, "61", 2) 
+      dataset.get_next(2).count.should eq 2
+    end
+
+    it "should filter out results" do
+      call1 = dataset.get_next(5)
+      call1.count.should eq 5
+      dataset.register_locker(3, "Raz")
+      dataset.lock_id(3, "61", 3) 
+      call2 = dataset.get_next(5)
+      call2.count.should eq 5
+      call1.should_not eq call2
+    end    
+
   end
 
 end
@@ -118,7 +150,7 @@ end
 describe :SolrPersistnce do
   let!(:solr_persistance) {SwitchBoard::SolrPersistance.new}
 
-  it "should have method get_next" do
+  it "should have method candidates" do
     solr_persistance.should respond_to(:candidates)
   end
 
