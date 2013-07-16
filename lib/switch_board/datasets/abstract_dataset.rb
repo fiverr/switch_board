@@ -46,7 +46,12 @@ module SwitchBoard
     #Set ID of an object as locked for a specific uid
     def unlock_id(locker_uid, id_to_unlock)
       raise "#{__method__} not implemented in #{self.class.name}"
-    end    
+    end
+
+    #Check to see if a certain ID is locked or not
+    def is_id_locked?(uid)
+      raise "#{__method__} not implemented in #{self.class.name}"
+    end
 
     #Retrive all the locked ids in the switchboard
     def get_all_locked_ids
