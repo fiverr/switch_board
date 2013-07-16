@@ -1,5 +1,3 @@
-gem 'rspec', '~> 2.4'
 require 'rspec'
-require 'switch_board/version'
 
-include SwitchBoard
+Dir["#{File.dirname(__FILE__)}/../lib/**/*.rb"].each { |f| load(f)  }

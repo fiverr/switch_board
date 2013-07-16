@@ -5,8 +5,8 @@ require File.expand_path('../lib/switch_board/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.name          = "switch_board"
   gem.version       = SwitchBoard::VERSION
-  gem.summary       = %q{TODO: Summary}
-  gem.description   = %q{TODO: Description}
+  gem.summary       = %q{Coordinate a set of persisted data and distribute to an active set of registerd clients}
+  gem.description   = %q{Coordinate a set of persisted data models and distribute to an active set of registerd clients.  Allows locking and automatic expiration for locking on portions of the data}
   gem.license       = "MIT"
   gem.authors       = ["Avner Cohen"]
   gem.email         = "israbirding@gmail.com"

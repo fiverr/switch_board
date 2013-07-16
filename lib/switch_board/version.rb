@@ -1,4 +1,3 @@
 module SwitchBoard
-  # switch_board version
   VERSION = "0.1.0"
 end
