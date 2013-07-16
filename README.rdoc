@@ -1,0 +1,27 @@
+= switch_board
+
+* {Homepage}[https://rubygems.org/gems/switch_board]
+* {Documentation}[http://rubydoc.info/gems/switch_board/frames]
+* {Email}[mailto:israbirding at gmail.com]
+
+== Description
+
+TODO: Description
+
+== Features
+
+== Examples
+
+  require 'switch_board'
+
+== Requirements
+
+== Install
+
+  $ gem install switch_board
+
+== Copyright
+
+Copyright (c) 2013 Avner Cohen
+
+See LICENSE.txt for details.
