@@ -6,12 +6,15 @@
 
 **SwitchBoard** is a utility gem designed to help in the coordinate of locked object to a set of "lockers".
 Think of a bank's cashiers, where customers are in line to be served, they are the dataset.
+
 When a customer is served by a cashier, it is still in line to be served, but is now "locked".
+
 Locking is indicated in the "Persistance" layer.
-Locking expiration is allowed so that if during "serving" a cashier gotta run home, it will go back to the queue when released.
+
+Locking expiration is allowed so that if during "serving" a cashier got some other business to do and runs home, it will go back to the queue when lock expires.
 
 
-The workflow has two main components:
+As such, the workflow has two main components:
 
 * Dataset - Implementaion is Solr based for now, but can be replaced.
 * Persistance - Implement is Redis based, but can be replaced
