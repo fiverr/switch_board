@@ -63,6 +63,8 @@ It is pluggable and well tested so should allow extensions as needed.
   #Show all locked objects
   dataset.get_all_locked_ids #=> {"12345"=>"2", "qwerfggj"=>"2"}
 
+  #Get next 5 items from persistance that are not locked
+  [{"id"=>"21"}, {"id"=>"51"}, {"id"=>"71"}, {"id"=>"91"}, {"id"=>"121"}, {"id"=>"131"}]
 
 
 ````
