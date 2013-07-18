@@ -46,14 +46,27 @@ It is pluggable and well tested so should allow extensions as needed.
   dataset.lock_id(2, "12345", 600) #Lock for 10 minutes
 
   #Check to see if ID is locked
-  dataset.is_id_locked?("12345") #=> true
-  dataset.is_id_locked?("qwerfggj") #=> true
-  dataset.is_id_locked?("not_locked_id") #=> false
-
+  dataset.id_locked?("12345") #=> true
+  dataset.id_locked?("qwerfggj") #=> true
+  dataset.id_locked?("not_locked_id") #=> false
+  
   #Show all locked objects
   dataset.get_all_locked_ids #=> {"12345"=>"2", "qwerfggj"=>"2"}
 
 ````
+### Other Gems
+
+Worth mentioning that there are other nice gems that takes care of Redis-backed Mutex implementaion:
+
+* https://github.com/dv/redis-semaphore
+* https://github.com/mlanett/redis-lock
+* https://github.com/kenn/redis-mutex
+
+However, this gem is not target a protection on specific a single resource during operation,
+instead it is targated to manage Distrbition of work between multiple clients/lockers that can take longer time to process the locked resources.
+It is also not targated for high scale systems, locking is done by humans so there is little to no risk in race conditions.
+And lastly, the gem provides an API to get all currently locked IDs which is important for the "switch_board" problem where some high level managment of the currently locked ID is needed.
+
 
 ### Install
 
