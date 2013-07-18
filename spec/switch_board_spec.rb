@@ -87,24 +87,36 @@ describe :RedisDataset do
     it "should return unlocked of unlocked key" do
       dataset.register_locker(1, "Pupik")
       dataset.register_locker(2, "Raz")
-      dataset.id_locked?("SOME_ID_8").should be_false
+      dataset.id_locked?("SOME_ID_4").should be_false
     end    
 
     it "should allow getting all the locked IDs" do
       dataset.register_locker(1, "Pupik")
       dataset.register_locker(2, "Raz")
-      expect { dataset.lock_id(1, "SOME_ID_4") }.not_to raise_error
+      expect { dataset.lock_id(1, "SOME_ID_5") }.not_to raise_error
       expect { dataset.lock_id(1, "SOME_OTHER_ID") }.not_to raise_error
       expect { dataset.lock_id(2, "SOME_THIRD_ID") }.not_to raise_error      
       expect { dataset.lock_id(2, "SOME_FOURTH_ID") }.not_to raise_error      
       dataset.get_all_locked_ids.count.should eq 4
     end
 
-    it "should get clean results when no IPs are locked" do
+    it "should get clean results when no IDs are locked" do
       dataset.register_locker(1, "Pupik")
       dataset.register_locker(2, "Raz")
       dataset.get_all_locked_ids.count.should eq 0
     end
+
+    it "should allow users to get all IDs not locked by itself" do
+      dataset.register_locker(1, "Pupik")
+      dataset.register_locker(2, "Raz")
+      dataset.lock_id(1, "SOME_ID_6")
+      dataset.lock_id(1, "SOME_ID_7")
+      dataset.lock_id(1, "SOME_ID_8")
+      dataset.lock_id(2, "SOME_ID_9")
+      dataset.get_all_their_locked_ids(2).count.should eq 3
+
+    end
+
 
   end
 

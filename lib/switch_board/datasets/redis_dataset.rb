@@ -71,6 +71,11 @@ module SwitchBoard
       @con.hgetall "#{LOCK_MAP_KEY}_h"
     end
 
+    def get_all_their_locked_ids(uid)
+       clean_old_keys
+        res =@con.hgetall "#{LOCK_MAP_KEY}_h"
+        res.reject {|key, key_uid|  key_uid.to_s == uid.to_s }
+    end
 
     ##################### Private Methods #################
     private
