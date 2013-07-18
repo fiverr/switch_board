@@ -56,7 +56,7 @@ module SwitchBoard
 
     #Check if key exists to see if it is locked and it has not expired
     #before getting keys, remove expired keys
-    def is_id_locked?(id_to_check)
+    def id_locked?(id_to_check)
       @con.hexists("#{LOCK_MAP_KEY}_h", id_to_check)
     end
 

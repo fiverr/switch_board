@@ -49,7 +49,7 @@ module SwitchBoard
     end
 
     #Check to see if a certain ID is locked or not
-    def is_id_locked?(uid)
+    def id_locked?(uid)
       raise "#{__method__} not implemented in #{self.class.name}"
     end
 
