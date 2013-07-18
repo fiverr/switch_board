@@ -70,7 +70,7 @@ describe :RedisDataset do
       dataset.register_locker(1, "Pupik")
       dataset.register_locker(2, "Raz")
       expect { dataset.lock_id(1, "SOME_ID_E") }.not_to raise_error
-      is_locked = dataset.is_id_locked?("SOME_ID_E")
+      is_locked = dataset.id_locked?("SOME_ID_E")
       is_locked.should eq true
     end
 
@@ -79,15 +79,15 @@ describe :RedisDataset do
       dataset.register_locker(1, "Pupik")
       dataset.register_locker(2, "Raz")
       expect { dataset.lock_id(1, "SOME_ID_2", 1) }.not_to raise_error
-      dataset.is_id_locked?("SOME_ID_2").should be_true
+      dataset.id_locked?("SOME_ID_2").should be_true
       sleep(2)
-      dataset.is_id_locked?("SOME_ID_3").should be_false
+      dataset.id_locked?("SOME_ID_3").should be_false
     end
 
     it "should return unlocked of unlocked key" do
       dataset.register_locker(1, "Pupik")
       dataset.register_locker(2, "Raz")
-      dataset.is_id_locked?("SOME_ID_8").should be_false
+      dataset.id_locked?("SOME_ID_8").should be_false
     end    
 
     it "should allow getting all the locked IDs" do
