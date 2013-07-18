@@ -5,27 +5,17 @@
 ### Description
 
 **SwitchBoard** is a utility gem designed to help in the coordination of locked objects by a set of "lockers".
-Think of a bank's cashiers, where customers are in line to be served, they are the dataset.
-
+Think of a bank's cashiers, where customers are in line to be served.
 When a customer is served by a cashier, it is still in line to be served, but is now "locked".
 
-Locking is indicated in the "Persistance" layer.
-
 Locking expiration is allowed so that if during "serving" a cashier got some other business to do and runs home, it will go back to the queue when lock expires.
-
-
-As such, the workflow has two main components:
-
-* Dataset - Implementaion is Solr based for now, but can be replaced.
-* Persistance - Implement is Redis based, but can be replaced
 
 The overall scope of the gem is:
 
 * Allow "lockers" to register themselves
 * Allow "lockers" to set a "lock" on object, with a predefined expiration period
-* Allow any client to retrive data from some persistance layer excluding the keys that are locked at the moment.
+* Allow lockers with special "roles" to force locks
 * Allow external observes to see current state of locked object
-
 
 ### Features
 
@@ -63,10 +53,6 @@ It is pluggable and well tested so should allow extensions as needed.
   #Show all locked objects
   dataset.get_all_locked_ids #=> {"12345"=>"2", "qwerfggj"=>"2"}
 
-  #Get next 5 items from persistance that are not locked
-  [{"id"=>"21"}, {"id"=>"51"}, {"id"=>"71"}, {"id"=>"91"}, {"id"=>"121"}, {"id"=>"131"}]
-
-
 ````
 
 ### Install
@@ -75,7 +61,5 @@ It is pluggable and well tested so should allow extensions as needed.
   $ gem install switch_board
 ````
 ### Copyright
-
-Copyright (c) 2013 Avner Cohen
 
 See LICENSE.txt for details.
