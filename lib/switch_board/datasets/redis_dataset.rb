@@ -42,7 +42,7 @@ module SwitchBoard
     end
 
     def locker(uid)
-      (list_lockers.select {|locker| locker["uid"].to_i == uid}).first
+      (list_lockers.select {|locker| locker["uid"] == uid}).first
     end
 
     #Locking mechanisem is based on sorted set, sorted set is used to allow a simulation
