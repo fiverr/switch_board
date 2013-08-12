@@ -46,6 +46,14 @@ describe :RedisDataset do
       lockers.count.should eq 3
     end
 
+    it "should allow registering with strings" do
+      dataset.register_locker("2345", "Moshe")
+      dataset.register_locker("1234", "Raz")
+      lockers = dataset.list_lockers
+      lockers.count.should eq 2
+    end
+
+
     it "should allow getting name of a registered locker by uid" do
       dataset.register_locker(1, "Pupik")
       dataset.register_locker(2, "Raz")

@@ -30,7 +30,7 @@ It is pluggable and well tested so should allow extensions as needed.
 
 
   #create a new switch_board configuration
-  sb = SwitchBoard::Configuration.new #default to Solr + Redis backends
+  sb = SwitchBoard::Configuration.new #Redis backends
   dataset = sb.dataset
 
   #Register Lockers (unique identifier, Name/Alias)
