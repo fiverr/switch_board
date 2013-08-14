@@ -72,9 +72,8 @@ module SwitchBoard
     end
 
     def get_all_their_locked_ids(uid)
-       clean_old_keys
-        res =@con.hgetall "#{LOCK_MAP_KEY}_h"
-        res.reject {|key, key_uid|  key_uid.to_s == uid.to_s }
+      res = get_all_locked_ids
+      res.reject {|key, key_uid|  key_uid.to_s == uid.to_s }
     end
 
     ##################### Private Methods #################
@@ -88,7 +87,7 @@ module SwitchBoard
       end
     end
 
- def redis_time
+    def redis_time
       instant = @con.time
       Time.at(instant[0], instant[1]).to_i
     end    
