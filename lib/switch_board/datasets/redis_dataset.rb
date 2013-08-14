@@ -76,6 +76,11 @@ module SwitchBoard
       res.reject {|key, key_uid|  key_uid.to_s == uid.to_s }
     end
 
+    def get_all_my_locked_ids(uid)
+      res = get_all_locked_ids
+      res.select {|key, key_uid|  key_uid.to_s == uid.to_s }
+    end
+    
     ##################### Private Methods #################
     private
 

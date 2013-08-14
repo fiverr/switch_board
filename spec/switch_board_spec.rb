@@ -126,8 +126,18 @@ describe :RedisDataset do
       dataset.lock_id(1, "SOME_ID_8")
       dataset.lock_id(2, "SOME_ID_9")
       dataset.get_all_their_locked_ids(2).count.should eq 3
-
     end
+
+
+    it "should allow users to get all IDs locked by themselves" do
+      dataset.register_locker(1, "Pupik")
+      dataset.register_locker(2, "Raz")
+      dataset.lock_id(1, "SOME_ID_6")
+      dataset.lock_id(1, "SOME_ID_7")
+      dataset.lock_id(1, "SOME_ID_8")
+      dataset.lock_id(2, "SOME_ID_9")
+      dataset.get_all_my_locked_ids(2).count.should eq 1
+    end    
 
 
   end
