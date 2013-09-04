@@ -10,7 +10,7 @@ module SwitchBoard
     LOCK_MAP_KEY = "switch_board::locked_ids"
     attr_accessor  :con, :switchboard, :name
 
-    def initialize(name = "redis_switchbord", host = "127.0.0.1", port = 6379)
+    def initialize(host = "127.0.0.1", port = 6379, name = "redis_switchbord")
       @con = Redis.new(:host => host, :port => port)
       @name = name
     end
