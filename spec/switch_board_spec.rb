@@ -14,20 +14,41 @@ end
 
 describe :Configuration do
   it "should have a dataset" do
-    conf = SwitchBoard::Configuration.new
+    conf = SwitchBoard::Configuration.new(SwitchBoard::RedisDataset.new("testing_playground"))
     conf.should respond_to(:dataset)
   end
 end
 
+describe :ApplicationLifeCycle do
+    it "should not lose locks with multiple workers starting a new dataset" do
+      dataset1 = SwitchBoard::Configuration.new(SwitchBoard::RedisDataset.new("testing_playground")).dataset
+      dataset1.cleanup
+      dataset1.register_locker(1, "Moshe")
+      dataset1.list_lockers.count.should eq 1
+      dataset2 = SwitchBoard::Configuration.new(SwitchBoard::RedisDataset.new("testing_playground")).dataset
+      #dataset1 should still show single locker
+      dataset1.list_lockers.count.should eq 1
+  end
+
+  it "should be possible to name switchboard dataset" do
+    dataset = SwitchBoard::RedisDataset.new("testing_playground")
+    dataset.name.should eq "testing_playground"
+  end
+end
+
 describe :RedisDataset do
-  let!(:dataset) {SwitchBoard::Configuration.new.dataset }
+  let!(:dataset) {
+      dataset = SwitchBoard::Configuration.new(SwitchBoard::RedisDataset.new("testing_playground")).dataset
+      dataset.cleanup
+      dataset
+    }
 
   it "should implemenet get_locked" do
     expect { dataset.get_locked }.not_to raise_error
   end
 
   describe :RedisDatasetSwitchBoard do
-    let!(:switchboard) {SwitchBoard::Configuration.new.dataset.switchboard }
+    let!(:switchboard) {SwitchBoard::Configuration.new(SwitchBoard::RedisDataset.new("testing_playground")).dataset.switchboard }
 
     it "should be able to create a new locking set" do
       switchboard.should match_array([])

@@ -6,18 +6,21 @@ module SwitchBoard
 
   class RedisDataset < SwitchBoard::AbstractDataset
 
-    SWITCHBOARD_NAME ="redis_switchbord"
+     
     LOCK_MAP_KEY = "switch_board::locked_ids"
-    attr_accessor  :con, :switchboard
+    attr_accessor  :con, :switchboard, :name
 
-    def initialize(host = "127.0.0.1", port = 6379)
+    def initialize(name = "redis_switchbord", host = "127.0.0.1", port = 6379)
       @con = Redis.new(:host => host, :port => port)
-      ## clean up keys
-      @con.del SWITCHBOARD_NAME
+      @name = name
+    end
+
+    def cleanup
+      ## clean up keys, used mainly for testing
+      @con.del @name
       @con.del "#{LOCK_MAP_KEY}_z"
       @con.del "#{LOCK_MAP_KEY}_h"
     end
-
 
     def get_locked
       active_lockers = list_lockers.map { |item| JSON.parse(item)}
@@ -25,20 +28,17 @@ module SwitchBoard
     end
 
     def switchboard
-      @switchboard ||= (
-                                  @con.del SWITCHBOARD_NAME
-                                  @con.smembers SWITCHBOARD_NAME
-                                  )
+      @switchboard ||= @con.smembers @name
     end
 
     def register_locker(uid, name)
-      @con.sadd SWITCHBOARD_NAME, {uid: uid, name: name, created_at: redis_time}.to_json.to_s
+      @con.sadd @name, {uid: uid, name: name, created_at: redis_time}.to_json.to_s
       list_lockers ## update lockers list
       true
     end
 
     def list_lockers
-      list_lockers ||= (@con.smembers SWITCHBOARD_NAME).map { |item| JSON.parse(item)}
+      list_lockers ||= (@con.smembers @name).map { |item| JSON.parse(item)}
     end
 
     def locker(uid)
