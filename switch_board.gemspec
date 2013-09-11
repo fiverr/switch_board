@@ -10,7 +10,7 @@ Gem::Specification.new do |gem|
   gem.license       = "MIT"
   gem.authors       = ["Avner Cohen"]
   gem.email         = "israbirding@gmail.com"
-  gem.homepage      = "https://rubygems.org/gems/switch_board"
+  gem.homepage      = "https://github.com/fiverr/switch_board"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
