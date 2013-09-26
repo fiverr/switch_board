@@ -63,7 +63,7 @@ module SwitchBoard
 
 
     def unlock_id(locker_uid, id_to_unlock)
-      @con.hset("#{LOCK_MAP_KEY}_h", id_to_lock, locker_uid)
+      @con.hset("#{LOCK_MAP_KEY}_h", id_to_unlock, locker_uid)
     end
 
     def get_all_locked_ids
