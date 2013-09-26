@@ -1,3 +1,9 @@
+require 'spec_helper'
+
+# Add when debugging
+# require 'pry'
+# require 'pry-debugger'
+
 describe SwitchBoard do
   it "should have a VERSION constant" do
     subject.const_get('VERSION').should_not be_empty
@@ -20,14 +26,14 @@ describe :Configuration do
 end
 
 describe :ApplicationLifeCycle do
-    it "should not lose locks with multiple workers starting a new dataset" do
-      dataset1 = SwitchBoard::Configuration.new(SwitchBoard::RedisDataset.new("127.0.0.1", 6379, "testing_playground")).dataset
-      dataset1.cleanup
-      dataset1.register_locker(1, "Moshe")
-      dataset1.list_lockers.count.should eq 1
-      dataset2 = SwitchBoard::Configuration.new(SwitchBoard::RedisDataset.new("127.0.0.1", 6379, "testing_playground")).dataset
-      #dataset1 should still show single locker
-      dataset1.list_lockers.count.should eq 1
+  it "should not lose locks with multiple workers starting a new dataset" do
+    dataset1 = SwitchBoard::Configuration.new(SwitchBoard::RedisDataset.new("127.0.0.1", 6379, "testing_playground")).dataset
+    dataset1.cleanup
+    dataset1.register_locker(1, "Moshe")
+    dataset1.list_lockers.count.should eq 1
+    dataset2 = SwitchBoard::Configuration.new(SwitchBoard::RedisDataset.new("127.0.0.1", 6379, "testing_playground")).dataset
+    #dataset1 should still show single locker
+    dataset1.list_lockers.count.should eq 1
   end
 
   it "should be possible to name switchboard dataset" do
@@ -160,6 +166,13 @@ describe :RedisDataset do
       dataset.get_all_my_locked_ids(2).count.should eq 1
     end    
 
+    it "should unlock id successfully", :focus => true do
+      dataset.register_locker(1, "Pupik")
+      dataset.lock_id(2, "SOME_ID_6", 100)
+      dataset.get_all_my_locked_ids(2).count.should eq 1
+      dataset.unlock_id(2, "SOME_ID_6")
+      dataset.get_all_my_locked_ids(2).count.should eq 0
+    end
 
   end
 

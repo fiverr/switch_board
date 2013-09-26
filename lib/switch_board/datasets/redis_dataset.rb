@@ -63,7 +63,7 @@ module SwitchBoard
 
 
     def unlock_id(locker_uid, id_to_unlock)
-      @con.hset("#{LOCK_MAP_KEY}_h", id_to_unlock, locker_uid)
+      @con.del("#{LOCK_MAP_KEY}_h", id_to_unlock, locker_uid)
     end
 
     def get_all_locked_ids
@@ -78,7 +78,7 @@ module SwitchBoard
 
     def get_all_my_locked_ids(uid)
       res = get_all_locked_ids
-      res.select {|key, key_uid|  key_uid.to_s == uid.to_s }
+      get_all_locked_ids.select {|key, key_uid|  key_uid.to_s == uid.to_s }
     end
     
     ##################### Private Methods #################
