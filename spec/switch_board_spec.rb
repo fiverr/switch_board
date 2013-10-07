@@ -139,6 +139,16 @@ describe :RedisDataset do
       dataset.get_all_locked_ids.count.should eq 4
     end
 
+    it "should unlock only the specific id requested getting all the locked IDs" do
+      dataset.register_locker(1, "Pupik")
+      expect { dataset.lock_id(1, "SOME_ID_5") }.not_to raise_error
+      expect { dataset.lock_id(1, "SOME_OTHER_ID") }.not_to raise_error
+      expect { dataset.lock_id(1, "SOME_OTHER_ID_KK") }.not_to raise_error
+      dataset.get_all_locked_ids.count.should eq 3
+      dataset.unlock_id(1, "SOME_ID_5")
+      dataset.get_all_locked_ids.count.should eq 2
+    end
+
     it "should get clean results when no IDs are locked" do
       dataset.register_locker(1, "Pupik")
       dataset.register_locker(2, "Raz")
@@ -166,7 +176,7 @@ describe :RedisDataset do
       dataset.get_all_my_locked_ids(2).count.should eq 1
     end    
 
-    it "should unlock id successfully", :focus => true do
+    it "should unlock id successfully" do
       dataset.register_locker(1, "Pupik")
       dataset.lock_id(2, "SOME_ID_6", 100)
       dataset.get_all_my_locked_ids(2).count.should eq 1
