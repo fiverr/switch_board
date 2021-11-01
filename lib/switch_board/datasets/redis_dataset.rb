@@ -6,20 +6,20 @@ module SwitchBoard
 
   class RedisDataset < SwitchBoard::AbstractDataset
 
-     
     LOCK_MAP_KEY = "switch_board::locked_ids"
     attr_accessor  :con, :switchboard, :name
 
-    def initialize(host = "127.0.0.1", port = 6379, name = "redis_switchbord")
+    def initialize(host = "127.0.0.1", port = 6379, name = "redis_switchbord", namespace = nil)
       @con = Redis.new(:host => host, :port => port)
       @name = name
+      @lock_map_key = namespace.nil? ? LOCK_MAP_KEY : "#{LOCK_MAP_KEY}::#{namespace}"
     end
 
     def cleanup
       ## clean up keys, used mainly for testing
       @con.del @name
-      @con.del "#{LOCK_MAP_KEY}_z"
-      @con.del "#{LOCK_MAP_KEY}_h"
+      @con.del "#{@lock_map_key}_z"
+      @con.del "#{@lock_map_key}_h"
     end
 
     def get_locked
@@ -50,25 +50,25 @@ module SwitchBoard
     def lock_id(locker_uid, id_to_lock, expire_in_sec = 5)
       now = redis_time
       @con.multi do
-        @con.zadd("#{LOCK_MAP_KEY}_z", (now + expire_in_sec), id_to_lock)
-        @con.hset("#{LOCK_MAP_KEY}_h", id_to_lock, locker_uid)
+        @con.zadd("#{@lock_map_key}_z", (now + expire_in_sec), id_to_lock)
+        @con.hset("#{@lock_map_key}_h", id_to_lock, locker_uid)
       end
     end
 
     #Check if key exists to see if it is locked and it has not expired
     #before getting keys, remove expired keys
     def id_locked?(id_to_check)
-      @con.hexists("#{LOCK_MAP_KEY}_h", id_to_check)
+      @con.hexists("#{@lock_map_key}_h", id_to_check)
     end
 
 
     def unlock_id(locker_uid, id_to_unlock)
-      @con.hdel("#{LOCK_MAP_KEY}_h", id_to_unlock)
+      @con.hdel("#{@lock_map_key}_h", id_to_unlock)
     end
 
     def get_all_locked_ids
       clean_old_keys
-      @con.hgetall "#{LOCK_MAP_KEY}_h"
+      @con.hgetall "#{@lock_map_key}_h"
     end
 
     def get_all_their_locked_ids(uid)
@@ -80,22 +80,22 @@ module SwitchBoard
       res = get_all_locked_ids
       get_all_locked_ids.select {|key, key_uid|  key_uid.to_s == uid.to_s }
     end
-    
+
     ##################### Private Methods #################
     private
 
     def clean_old_keys
-      keys = @con.zrangebyscore("#{LOCK_MAP_KEY}_z", 0, redis_time)
+      keys = @con.zrangebyscore("#{@lock_map_key}_z", 0, redis_time)
       if keys.size > 0
-        @con.zremrangebyscore("#{LOCK_MAP_KEY}_z", 0, redis_time)
-        keys.each {|key| @con.hdel("#{LOCK_MAP_KEY}_h", key)}
+        @con.zremrangebyscore("#{@lock_map_key}_z", 0, redis_time)
+        keys.each {|key| @con.hdel("#{@lock_map_key}_h", key)}
       end
     end
 
     def redis_time
       instant = @con.time
       Time.at(instant[0], instant[1]).to_i
-    end    
+    end
 
   end
 

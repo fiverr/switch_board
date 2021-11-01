@@ -40,6 +40,33 @@ describe :ApplicationLifeCycle do
     dataset = SwitchBoard::RedisDataset.new("127.0.0.1", 6379, "testing_playground")
     dataset.name.should eq "testing_playground"
   end
+
+  it "should be possible to specify a namespace for the lock map" do
+    # set up a lock collection
+    namespace1 = "locks_a"
+    dataset1 = SwitchBoard::RedisDataset.new(
+      "127.0.0.1", 6379, "testing_playground", namespace1)
+    dataset1.cleanup
+    dataset1.register_locker(1, "Moshe")
+    expect { dataset1.lock_id(1, "id_1") }.not_to raise_error
+
+    # set up another lock collection
+    namespace2 = "locks_b"
+    dataset2 = SwitchBoard::RedisDataset.new(
+      "127.0.0.1", 6379, "testing_playground", namespace2)
+    dataset2.cleanup
+    dataset2.register_locker(1, "Moshe")
+    expect { dataset2.lock_id(1, "id_2") }.not_to raise_error
+
+    # verify locks don't clash
+    dataset1.list_lockers.count.should eq 1
+    dataset1.id_locked?("id_1").should eq true
+    dataset1.id_locked?("id_2").should eq false
+
+    dataset2.list_lockers.count.should eq 1
+    dataset2.id_locked?("id_1").should eq false
+    dataset2.id_locked?("id_2").should eq true
+  end
 end
 
 describe :RedisDataset do
@@ -83,7 +110,7 @@ describe :RedisDataset do
     it "should allow getting a locker registerd with a non int UID" do
       dataset.register_locker("muke", "Moshe")
       dataset.locker("muke")["name"].should eq("Moshe")
-    end    
+    end
 
     it "should allow getting name of a registered locker by uid" do
       dataset.register_locker(1, "Pupik")
@@ -118,24 +145,24 @@ describe :RedisDataset do
       dataset.register_locker(1, "Pupik")
       dataset.register_locker(2, "Raz")
       expect { dataset.lock_id(1, "SOME_ID_2", 1) }.not_to raise_error
-      dataset.id_locked?("SOME_ID_2").should be_true
+      dataset.id_locked?("SOME_ID_2").should be true
       sleep(2)
-      dataset.id_locked?("SOME_ID_3").should be_false
+      dataset.id_locked?("SOME_ID_3").should be false
     end
 
     it "should return unlocked of unlocked key" do
       dataset.register_locker(1, "Pupik")
       dataset.register_locker(2, "Raz")
-      dataset.id_locked?("SOME_ID_4").should be_false
-    end    
+      dataset.id_locked?("SOME_ID_4").should be false
+    end
 
     it "should allow getting all the locked IDs" do
       dataset.register_locker(1, "Pupik")
       dataset.register_locker(2, "Raz")
       expect { dataset.lock_id(1, "SOME_ID_5") }.not_to raise_error
       expect { dataset.lock_id(1, "SOME_OTHER_ID") }.not_to raise_error
-      expect { dataset.lock_id(2, "SOME_THIRD_ID") }.not_to raise_error      
-      expect { dataset.lock_id(2, "SOME_FOURTH_ID") }.not_to raise_error      
+      expect { dataset.lock_id(2, "SOME_THIRD_ID") }.not_to raise_error
+      expect { dataset.lock_id(2, "SOME_FOURTH_ID") }.not_to raise_error
       dataset.get_all_locked_ids.count.should eq 4
     end
 
@@ -174,7 +201,7 @@ describe :RedisDataset do
       dataset.lock_id(1, "SOME_ID_8")
       dataset.lock_id(2, "SOME_ID_9")
       dataset.get_all_my_locked_ids(2).count.should eq 1
-    end    
+    end
 
     it "should unlock id successfully" do
       dataset.register_locker(1, "Pupik")
